@@ -77,7 +77,11 @@ It's ideal for users who frequently switch between home networks, gaming acceler
 
 #### 🛠️ Get from GitHub Releases
 
+Click [here](https://github.com/sixiaolong1117/NetProfile-Switcher-for-Decky/releases/latest/download/NetProfile.Switcher.zip) to download the latest version now, or install the latest version via the Decky plugin using the following URL:
 
+```
+https://github.com/sixiaolong1117/NetProfile-Switcher-for-Decky/releases/latest/download/NetProfile.Switcher.zip
+```
 
 #### 🛠️ Build from Source
 

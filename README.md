@@ -77,7 +77,11 @@ NetProfile Switcher for Decky 是一个用于 Steam Deck 的网络配置切换�
 
 #### 🛠️ 从 GitHub Releases 获取
 
+点击 [此处](https://github.com/sixiaolong1117/NetProfile-Switcher-for-Decky/releases/latest/download/NetProfile.Switcher.zip) 立刻下载最新版本，或在 Decky 插件上通过以下 URL 安装最新版本：
 
+```
+https://github.com/sixiaolong1117/NetProfile-Switcher-for-Decky/releases/latest/download/NetProfile.Switcher.zip
+```
 
 #### 🛠️ 从源码构建
 
