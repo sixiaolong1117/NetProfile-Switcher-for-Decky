@@ -30,6 +30,7 @@ const saveProfile = callable<[NetworkProfile], ApiResult>("save_profile");
 const deleteProfile = callable<[string], ApiResult>("delete_profile");
 const getCurrentNetwork = callable<[], CurrentNetwork>("get_current_network");
 const applyProfile = callable<[string], ApiResult>("apply_profile");
+const setDhcp = callable<[], ApiResult>("set_dhcp");
 const validateIp = callable<[string], boolean>("validate_ip");
 const validateSubnet = callable<[string], boolean>("validate_subnet");
 
@@ -337,6 +338,7 @@ function Content() {
   const [profiles, setProfiles] = useState<NetworkProfile[]>([]);
   const [currentNet, setCurrentNet] = useState<CurrentNetwork>({});
   const [loading, setLoading] = useState(true);
+  const [settingDhcp, setSettingDhcp] = useState(false);
   const [applyingProfile, setApplyingProfile] = useState<string | null>(null);
   const [focusedApplyProfile, setFocusedApplyProfile] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -389,6 +391,33 @@ function Content() {
       toaster.toast({ title: t("toast.applyFailed"), body: t("toast.applyFailedBody") });
     } finally {
       setApplyingProfile(null);
+    }
+  };
+
+  const handleSetDhcp = async () => {
+    setSettingDhcp(true);
+    setApplyError(null);
+    try {
+      const result = await setDhcp();
+
+      if (result.success) {
+        setApplyError(null);
+        toaster.toast({ title: t("toast.dhcpApplied"), body: apiMessage(result.message, result.error_action) });
+        setTimeout(() => refresh(), 2000);
+      } else {
+        setApplyError(result);
+        toaster.toast({ title: t("toast.applyFailed"), body: t("toast.applyFailedBody") });
+      }
+    } catch (e) {
+      const message = e instanceof Error ? e.stack || e.message : String(e);
+      setApplyError({
+        success: false,
+        message: "Frontend DHCP call failed",
+        error_details: message || t("api.unknownError"),
+      });
+      toaster.toast({ title: t("toast.applyFailed"), body: t("toast.applyFailedBody") });
+    } finally {
+      setSettingDhcp(false);
     }
   };
 
@@ -533,9 +562,19 @@ function Content() {
           </PanelSectionRow>
         )}
         <PanelSectionRow>
-          <ButtonItem layout="below" onClick={refresh} disabled={loading}>
+          <ButtonItem layout="below" onClick={refresh} disabled={loading || settingDhcp}>
             <FaSync className={loading ? "spin" : ""} style={{ marginRight: "8px" }} />
             {t("currentNetwork.refresh")}
+          </ButtonItem>
+        </PanelSectionRow>
+        <PanelSectionRow>
+          <ButtonItem layout="below" onClick={handleSetDhcp} disabled={loading || settingDhcp}>
+            {settingDhcp ? (
+              <FaSync className="spin" style={{ marginRight: "8px" }} />
+            ) : (
+              <FaWifi style={{ marginRight: "8px" }} />
+            )}
+            {settingDhcp ? t("currentNetwork.settingDhcp") : t("currentNetwork.setDhcp")}
           </ButtonItem>
         </PanelSectionRow>
       </PanelSection>

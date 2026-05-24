@@ -89,6 +89,43 @@ def _modify_connection(conn_name: str, changes: list[str], action: str) -> dict[
     return None
 
 
+def _set_connection_dhcp(conn_name: str) -> dict[str, Any] | None:
+    steps = [
+        (["ipv4.method", "auto", "ipv4.ignore-auto-dns", "no"], "Set IPv4 method to DHCP"),
+        (["ipv4.gateway", ""], "Clear IPv4 gateway"),
+        (["ipv4.addresses", ""], "Clear IPv4 address"),
+        (["ipv4.dns", ""], "Clear IPv4 DNS"),
+    ]
+    for changes, action in steps:
+        error = _modify_connection(conn_name, changes, action)
+        if error:
+            return error
+    return None
+
+
+def _reactivate_connection(conn_name: str, success_message: str) -> dict[str, Any]:
+    interface = _get_interface_for_connection(conn_name)
+    if interface:
+        rc, stdout, stderr = _run_nmcli(["device", "reapply", interface])
+        if rc == 0:
+            decky.logger.info(success_message)
+            return {"success": True, "message": success_message}
+        decky.logger.warning(_format_nmcli_error("Reapply device", rc, stdout, stderr))
+
+    # Fall back to reconnecting the profile when device reapply is unavailable.
+    rc, _, stderr = _run_nmcli(["connection", "down", conn_name])
+    if rc != 0:
+        decky.logger.warning(f"Connection down warning: {stderr}")
+
+    args = ["connection", "up", conn_name]
+    rc, stdout, stderr = _run_nmcli(args)
+    if rc != 0:
+        return _nmcli_error_result("Reactivate connection", rc, stdout, stderr, args)
+
+    decky.logger.info(success_message)
+    return {"success": True, "message": success_message}
+
+
 def _get_active_connection() -> str | None:
     """Get the name of the currently active connection."""
     rc, stdout, stderr = _run_nmcli([
@@ -265,17 +302,9 @@ class Plugin:
         method = profile.get("method", "manual")
 
         if method == "auto":
-            steps = [
-                (["ipv4.addresses", ""], "Clear IPv4 address"),
-                (["ipv4.gateway", ""], "Clear IPv4 gateway"),
-                (["ipv4.dns", ""], "Clear IPv4 DNS"),
-                (["ipv4.ignore-auto-dns", "no"], "Allow automatic DNS"),
-                (["ipv4.method", "auto"], "Set IPv4 method to DHCP"),
-            ]
-            for changes, action in steps:
-                error = _modify_connection(conn_name, changes, action)
-                if error:
-                    return error
+            error = _set_connection_dhcp(conn_name)
+            if error:
+                return error
         else:
             # Manual configuration
             ip = str(profile.get("ip", "")).strip()
@@ -318,26 +347,19 @@ class Plugin:
                 if error:
                     return error
 
-        interface = _get_interface_for_connection(conn_name)
-        if interface:
-            rc, stdout, stderr = _run_nmcli(["device", "reapply", interface])
-            if rc == 0:
-                decky.logger.info(f"Profile '{name}' applied to connection '{conn_name}'")
-                return {"success": True, "message": f"Profile '{name}' applied successfully"}
-            decky.logger.warning(_format_nmcli_error("Reapply device", rc, stdout, stderr))
+        return _reactivate_connection(conn_name, f"Profile '{name}' applied successfully")
 
-        # Fall back to reconnecting the profile when device reapply is unavailable.
-        rc, _, stderr = _run_nmcli(["connection", "down", conn_name])
-        if rc != 0:
-            decky.logger.warning(f"Connection down warning: {stderr}")
+    async def set_dhcp(self) -> dict[str, Any]:
+        """Switch the current active connection back to DHCP."""
+        conn_name = _get_active_connection()
+        if not conn_name:
+            return {"success": False, "message": "No active network connection found"}
 
-        args = ["connection", "up", conn_name]
-        rc, stdout, stderr = _run_nmcli(args)
-        if rc != 0:
-            return _nmcli_error_result("Reactivate connection", rc, stdout, stderr, args)
+        error = _set_connection_dhcp(conn_name)
+        if error:
+            return error
 
-        decky.logger.info(f"Profile '{name}' applied to connection '{conn_name}'")
-        return {"success": True, "message": f"Profile '{name}' applied successfully"}
+        return _reactivate_connection(conn_name, "Switched current connection to DHCP")
 
     # ── Helpers ───────────────────────────────────────────────────
 
