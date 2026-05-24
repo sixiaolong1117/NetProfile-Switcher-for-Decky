@@ -1,11 +1,11 @@
 {
-  "name": "Example Plugin",
-  "author": "John Doe",
-  "flags": ["debug", "_root"],
+  "name": "NetProfile Switcher",
+  "author": "SI Xiaolong",
+  "flags": ["debug", "root"],
   "api_version": 1,
   "publish": {
-    "tags": ["template", "root"],
-    "description": "Decky example plugin.",
+    "tags": ["network", "profile", "utility"],
+    "description": "Save and quickly switch between network configuration presets (IP, subnet mask, gateway, DNS).",
     "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
   }
 }
