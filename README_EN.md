@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="assets/logo.svg" alt="NetProfile Switcher" width="128">
+<img src="assets/logo.png" alt="NetProfile Switcher" width="128">
 
 **A Decky network profile switching plugin for Steam Deck / SteamOS<br/>Save and quickly switch IPv4 static addresses, gateways, DNS, and DHCP modes**
 

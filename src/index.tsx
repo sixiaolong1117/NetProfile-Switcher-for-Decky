@@ -223,7 +223,7 @@ function ProfileEditorModal({
           <TextField
             value={form.name}
             onChange={(e) => updateField("name", e.target.value)}
-            placeholder={t("profileEditor.profileNamePlaceholder")}
+            {...({ placeholder: t("profileEditor.profileNamePlaceholder") } as any)}
           />
           {errors.name && (
             <div style={{ color: "#e74c3c", fontSize: "12px", marginTop: "4px" }}>
@@ -247,7 +247,7 @@ function ProfileEditorModal({
               <TextField
                 value={form.ip}
                 onChange={(e) => updateField("ip", e.target.value)}
-                placeholder="192.168.1.100"
+                {...({ placeholder: "192.168.1.100" } as any)}
               />
               {errors.ip && (
                 <div style={{ color: "#e74c3c", fontSize: "12px", marginTop: "4px" }}>
@@ -259,7 +259,7 @@ function ProfileEditorModal({
               <TextField
                 value={form.subnet_mask}
                 onChange={(e) => updateField("subnet_mask", e.target.value)}
-                placeholder="255.255.255.0"
+                {...({ placeholder: "255.255.255.0" } as any)}
               />
               {errors.subnet_mask && (
                 <div style={{ color: "#e74c3c", fontSize: "12px", marginTop: "4px" }}>
@@ -271,7 +271,7 @@ function ProfileEditorModal({
               <TextField
                 value={form.gateway}
                 onChange={(e) => updateField("gateway", e.target.value)}
-                placeholder="192.168.1.1"
+                {...({ placeholder: "192.168.1.1" } as any)}
               />
               {errors.gateway && (
                 <div style={{ color: "#e74c3c", fontSize: "12px", marginTop: "4px" }}>
@@ -295,7 +295,7 @@ function ProfileEditorModal({
                     <TextField
                       value={dns}
                       onChange={(e) => updateDns(i, e.target.value)}
-                      placeholder={t("profileEditor.dnsPlaceholder", { index: i + 1 })}
+                      {...({ placeholder: t("profileEditor.dnsPlaceholder", { index: i + 1 }) } as any)}
                     />
                   </div>
                   {form.dns.length > 1 && (
@@ -313,7 +313,7 @@ function ProfileEditorModal({
                   {errors.dns_0}
                 </div>
               )}
-              <ButtonItem onClick={addDns} style={{ marginTop: "4px" }}>
+              <ButtonItem onClick={addDns} {...({ style: { marginTop: "4px" } } as any)}>
                 <FaPlus style={{ marginRight: "8px" }} /> {t("profileEditor.addDns")}
               </ButtonItem>
             </>
@@ -660,7 +660,7 @@ function Content() {
           <ButtonItem
             layout="below"
             onClick={openAddModal}
-            style={{ borderColor: "#2ecc71", borderStyle: "dashed" }}
+            {...({ style: { borderColor: "#2ecc71", borderStyle: "dashed" } } as any)}
           >
             <FaPlus style={{ marginRight: "8px" }} /> {t("profiles.addNew")}
           </ButtonItem>
@@ -736,18 +736,20 @@ function Content() {
                   <DialogButton
                     onClick={() => handleApply(profile.name)}
                     disabled={applyingProfile === profile.name}
-                    onBlur={() => setFocusedApplyProfile((focused) => focused === profile.name ? null : focused)}
-                    onFocus={() => setFocusedApplyProfile(profile.name)}
-                    onGamepadBlur={() => setFocusedApplyProfile((focused) => focused === profile.name ? null : focused)}
-                    onGamepadFocus={() => setFocusedApplyProfile(profile.name)}
-                    style={{
-                      minWidth: 0,
-                      width: "100%",
-                      backgroundColor: focusedApplyProfile === profile.name ? "rgba(46,204,113,0.42)" : "rgba(46,204,113,0.15)",
-                      borderColor: focusedApplyProfile === profile.name ? "#7dffad" : "#2ecc71",
-                      boxShadow: focusedApplyProfile === profile.name ? "0 0 0 2px rgba(125,255,173,0.35)" : "none",
-                      color: focusedApplyProfile === profile.name ? "#ffffff" : undefined,
-                    }}
+                    {...({
+                      onBlur: () => setFocusedApplyProfile((focused) => focused === profile.name ? null : focused),
+                      onFocus: () => setFocusedApplyProfile(profile.name),
+                      onGamepadBlur: () => setFocusedApplyProfile((focused) => focused === profile.name ? null : focused),
+                      onGamepadFocus: () => setFocusedApplyProfile(profile.name),
+                      style: {
+                        minWidth: 0,
+                        width: "100%",
+                        backgroundColor: focusedApplyProfile === profile.name ? "rgba(46,204,113,0.42)" : "rgba(46,204,113,0.15)",
+                        borderColor: focusedApplyProfile === profile.name ? "#7dffad" : "#2ecc71",
+                        boxShadow: focusedApplyProfile === profile.name ? "0 0 0 2px rgba(125,255,173,0.35)" : "none",
+                        color: focusedApplyProfile === profile.name ? "#ffffff" : undefined,
+                      },
+                    } as any)}
                   >
                     {applyingProfile === profile.name ? (
                       <>

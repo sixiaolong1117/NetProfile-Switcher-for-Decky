@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="assets/logo.svg" alt="NetProfile Switcher" width="128">
+<img src="assets/logo.png" alt="NetProfile Switcher" width="128">
 
 **面向 Steam Deck / SteamOS 的 Decky 网络配置预设切换插件<br/>保存并快速切换 IPv4 静态地址、网关、DNS 与 DHCP 模式**
 
